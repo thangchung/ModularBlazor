@@ -3,23 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Linq;
 
 namespace MainApplication.Services
 {
     public class ModuleManager
     {
-        private Dictionary<PluginLoadContext, Assembly> _loadContexts = new Dictionary<PluginLoadContext, Assembly>();
+        private readonly Dictionary<PluginLoadContext, Assembly> _loadContexts = new Dictionary<PluginLoadContext, Assembly>();
 
         public event Action<IEnumerable<Assembly>> OnModulesLoaded;
 
         public bool Loaded { get; private set; }
 
+        public string AppName { get; private set; } = typeof(Program).Assembly.GetName().Name;
+
         public void LoadModules()
         {
             var modules = new List<string>
             {
-                @"Module1\bin\debug\netstandard2.0\Module1.dll",
-                @"Module2\bin\debug\netstandard2.0\Module2.dll"
+                $"{AppName}\\Modules\\Module1.dll",
+                $"{AppName}\\Modules\\Module2.dll"
             };
 
             foreach(var modulePath in modules)
@@ -57,6 +60,33 @@ namespace MainApplication.Services
 
             pluginLoadContext = new PluginLoadContext(pluginLocation);
             assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName(Path.GetFileNameWithoutExtension(pluginLocation)));
+
+            var resources = assembly.GetManifestResourceNames();
+            foreach(var resource in resources)
+            {
+                var fileName = resource.Split(":").Last();
+                var dirName = assembly.GetName().Name;
+                var stream = assembly.GetManifestResourceStream(resource);
+                if(!Directory.Exists($"{root}\\{AppName}\\wwwroot\\{dirName}"))
+                {
+                    Directory.CreateDirectory($"{root}\\{AppName}\\wwwroot\\{dirName}");
+                }
+                var file = File.Create($"{root}\\{AppName}\\wwwroot\\{dirName}\\{fileName}");
+                file.Write(ReadFully(stream));
+                file.Close();
+            }
+        }
+
+        private byte[] ReadFully(Stream input)
+        {
+            byte[] buffer = new byte[16 * 1024];
+            using MemoryStream ms = new MemoryStream();
+            int read;
+            while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                ms.Write(buffer, 0, read);
+            }
+            return ms.ToArray();
         }
     }
 }

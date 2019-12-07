@@ -1,3 +1,18 @@
-﻿<div class="my-component">
+﻿@inject IJSRuntime JSRuntime;
+
+<div class="my-component">
     This Blazor component is defined in the <strong>Module1</strong> package.
 </div>
+
+<p>This is actually the image as following</p>
+<img src="Module1/background.png"/>
+
+<p>Call inteprop</p>
+<button type="button" @onclick="OnClickHandle">Click me</button>
+
+@code {
+    public async Task OnClickHandle()
+    {
+        await ExampleJsInterop.Prompt(JSRuntime, "You clicked me!!!");
+    }
+}

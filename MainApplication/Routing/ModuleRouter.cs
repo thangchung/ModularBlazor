@@ -24,20 +24,21 @@ namespace MainApplication.Routing
             ModuleManager.OnModulesLoaded -= OnModulesLoaded;
         }
 
-        public new async Task SetParametersAsync(ParameterView parameters)
+        public new Task SetParametersAsync(ParameterView parameters)
         {
-            await base.SetParametersAsync(parameters);
+            return base.SetParametersAsync(parameters);
         }
 
-        private async void OnModulesLoaded(IEnumerable<Assembly> modules)
+        private void OnModulesLoaded(IEnumerable<Assembly> modules)
         {
-            var dict = new Dictionary<string, object>
+            var dict = new Dictionary<string, object>();
+            if (modules != null)
             {
-                { "AdditionalAssemblies", modules }
-            };
+                dict.Add("AdditionalAssemblies", modules);
+            }
 
             var pv = ParameterView.FromDictionary(dict);
-            await SetParametersAsync(pv);
+            SetParametersAsync(pv);
         }
     }
 }

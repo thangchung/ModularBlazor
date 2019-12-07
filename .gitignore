@@ -338,3 +338,8 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+**/*/Modules/
+# will change later
+**/*/wwwroot/Module1/
+**/*/wwwroot/Module2/

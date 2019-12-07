@@ -1,0 +1,4 @@
+﻿https://www.meziantou.net/inlining-a-stylesheet-a-javascript-or-an-image-file-using-a-taghelper-in-asp-net.htm
+
+// inline styled
+https://github.com/aspnet/AspNetCore/issues/14944
